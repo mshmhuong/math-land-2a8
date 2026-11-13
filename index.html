@@ -2,6 +2,16 @@
 <html lang="vi">
 <head>
 <meta charset="utf-8">
+<script>
+/* Mở bằng tệp trên máy (file://) thì Chrome KHÔNG nhớ quyền micro → hỏi "Tệp này muốn sử dụng micrô" mỗi lần bấm.
+   Nên tự chuyển sang bản online (https) – ở đó chỉ cần bấm "Cho phép mỗi khi truy cập trang web" 1 lần là xong. */
+(function(){
+  var ONLINE='https://mshmhuong.github.io/math-land-2a8/';
+  if(location.protocol==='file:'&&!/[?&]local=1/.test(location.search)&&navigator.onLine!==false){
+    location.replace(ONLINE+location.hash);
+  }
+})();
+</script>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Math Land – Toán Tiếng Anh Lớp 2A8</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
