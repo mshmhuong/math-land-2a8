@@ -347,7 +347,6 @@ tr.none td{color:var(--muted);opacity:.7}
       <button data-f="no" onclick="setFilter(this)">Chưa tham gia</button>
       <button data-s="stt" class="on" onclick="setSort(this)">Xếp theo STT</button>
       <button data-s="cnt" onclick="setSort(this)">Xếp theo số lần</button>
-      <button onclick="exportCSV()">⬇️ Tải CSV</button>
       <span class="src" id="src"></span>
     </div>
     <div class="tablewrap"><table><thead><tr><th>STT</th><th>Họ và tên</th><th style="text-align:center">Số lần</th><th style="text-align:center">Tổng ⭐</th><th style="text-align:center">Thời gian chơi</th><th style="text-align:center">Mức cao nhất</th><th style="text-align:center">Điểm cao nhất</th><th>Lần gần nhất</th></tr></thead><tbody id="tbody"></tbody></table></div>
@@ -364,23 +363,43 @@ tr.none td{color:var(--muted);opacity:.7}
 const SHEET_URL = "https://script.google.com/macros/s/AKfycbyQSV_C9oCBpcQLjIaQeZuZLSLYJzPTr8nH1l5Fc3FA760le0TrThOwJh2oUoc2O7KZAw/exec";
 
 const STUDENTS = [
- [1,'Nguyễn Dương Trường An','174187'],[2,'Trịnh Duy Đức An','691629'],[3,'Dương Quốc Nhật Anh','134406'],
- [4,'Nguyễn Trâm Anh','234769'],[5,'Trần Phương Anh','856725'],[6,'Đậu Gia Bảo','971642'],
- [7,'Nguyễn Hữu Quốc Bảo','530473'],[8,'Phạm Diệp Chi','284431'],[9,'Trần Anh Dũng','677334'],
- [10,'Phùng Nhất Dương','255143'],[11,'Lê Văn Thành Đạt','149934'],[12,'Đặng Ngọc Bảo Hân','762462'],
- [13,'Nguyễn Huỳnh Gia Hân','690306'],[14,'Bùi Trịnh Gia Hưng','486233'],[15,'Bùi Nguyễn Đức Khang','302091'],
- [16,'Nguyễn Minh Khang','788853'],[17,'Đỗ Nguyễn Gia Khiêm','898396'],[18,'Đàm Minh Khôi','921580'],
- [19,'Nguyễn Hoàng Thiên Khôi','495014'],[20,'Nguyễn Quang Kiên','125017'],[21,'Nguyễn Khánh Linh','556875'],
- [22,'Lê Trần Gia Long','189428'],[23,'Nguyễn Ngọc Thanh Mai','699945'],[24,'Vũ Anh Minh','208410'],
- [25,'Trịnh Diễm My','908944'],[26,'Đoàn Phương Nghi','706724'],[27,'Nguyễn Thị Ánh Ngọc','831173'],
- [28,'Đặng Thế Nhân','592169'],[29,'Nguyễn Lê Khánh Nhi','245956'],[30,'Huỳnh Mộc An Nhiên','745371'],
- [31,'Huỳnh Ngọc An Nhiên','628330'],[32,'Bùi Đức Khiêm Nhu','696278'],[33,'Huỳnh Nguyễn Thanh Phong','370619'],
- [34,'Nguyễn Thanh Phúc','579032'],[35,'Vũ Lam Phương','115783'],[36,'Trịnh Hồng Quân','424251'],
- [37,'Đỗ Thị Huyền Thanh','738104'],[38,'Lê Chí Thiện','845111'],[39,'Nguyễn Anh Thư','359322'],
- [40,'Nguyễn Minh Hoàng Trí','711270'],[41,'Đoàn Ngọc Nhã Uyên','378106'],[42,'Võ Thảo Vy','291835'],
- [43,'Đỗ Loan Như Ý','206672']
+ [1,'Nguyễn Dương Trường An','d6d70bfcabf36283'],[2,'Trịnh Duy Đức An','bbe7e652bbb79b72'],[3,'Dương Quốc Nhật Anh','eb4fa9e9138de446'],
+ [4,'Nguyễn Trâm Anh','d3f7b36d4d1d63de'],[5,'Trần Phương Anh','76504c5b814a39cb'],[6,'Đậu Gia Bảo','79abcb18f92d5620'],
+ [7,'Nguyễn Hữu Quốc Bảo','270e38cbc1d91c1e'],[8,'Phạm Diệp Chi','336dac24ba104d41'],[9,'Trần Anh Dũng','9d417d0428198b80'],
+ [10,'Phùng Nhất Dương','e389d698a1550e9e'],[11,'Lê Văn Thành Đạt','10d42502ff06261d'],[12,'Đặng Ngọc Bảo Hân','6589a2c33f403c33'],
+ [13,'Nguyễn Huỳnh Gia Hân','203c23738c42eac7'],[14,'Bùi Trịnh Gia Hưng','d645e5d5f4ffa693'],[15,'Bùi Nguyễn Đức Khang','c52ad678dfa8a6b0'],
+ [16,'Nguyễn Minh Khang','ed463913b47846a5'],[17,'Đỗ Nguyễn Gia Khiêm','d499e5be0d4de868'],[18,'Đàm Minh Khôi','3f4e33a281d1fd58'],
+ [19,'Nguyễn Hoàng Thiên Khôi','6ccc1a152b010913'],[20,'Nguyễn Quang Kiên','5888146f0ee29731'],[21,'Nguyễn Khánh Linh','04d882bd51eb48ba'],
+ [22,'Lê Trần Gia Long','fa719153027fae62'],[23,'Nguyễn Ngọc Thanh Mai','37380a59c293aa1e'],[24,'Vũ Anh Minh','626072adcde4191c'],
+ [25,'Trịnh Diễm My','3f6032c31cc0f558'],[26,'Đoàn Phương Nghi','eb76a8ee007ab313'],[27,'Nguyễn Thị Ánh Ngọc','87567065e32b74b8'],
+ [28,'Đặng Thế Nhân','836e678833f4078f'],[29,'Nguyễn Lê Khánh Nhi','c3213d13cb03ac7d'],[30,'Huỳnh Mộc An Nhiên','e19f95d595f9429f'],
+ [31,'Huỳnh Ngọc An Nhiên','b06194cd6df2aa22'],[32,'Bùi Đức Khiêm Nhu','f617d416b5b63887'],[33,'Huỳnh Nguyễn Thanh Phong','0c3e975dc3cc7f35'],
+ [34,'Nguyễn Thanh Phúc','b7d468191e877caf'],[35,'Vũ Lam Phương','776ef81aacf12035'],[36,'Trịnh Hồng Quân','5d3a723e76d8f835'],
+ [37,'Đỗ Thị Huyền Thanh','b169952583a4b62b'],[38,'Lê Chí Thiện','f2815ab314c5aaaa'],[39,'Nguyễn Anh Thư','b874aabfd35fe449'],
+ [40,'Nguyễn Minh Hoàng Trí','40891114026f09de'],[41,'Đoàn Ngọc Nhã Uyên','77ae9c27f4ca2ac1'],[42,'Võ Thảo Vy','aabbc8d326ada765'],
+ [43,'Đỗ Loan Như Ý','0f14efe4ef287d8e']
 ];
-const byCode = Object.fromEntries(STUDENTS.map(s=>[s[2],s]));
+/* Trang chỉ giữ dấu vết đã băm của mã, không giữ mã thật của bạn nào. */
+function bam(s){
+  const K=[],H=[],f=x=>(x-Math.floor(x))*4294967296|0;
+  for(let n=2,i=0;i<64;n++){let p=1;for(let d=2;d*d<=n;d++)if(n%d===0){p=0;break}if(p){if(i<8)H[i]=f(Math.sqrt(n));K[i++]=f(Math.cbrt(n))}}
+  const b=[];for(let i=0;i<s.length;i++)b.push(s.charCodeAt(i)&255);
+  const L=b.length*8;b.push(128);while(b.length%64!==56)b.push(0);
+  for(let j=7;j>=0;j--)b.push(j>3?0:(L>>>(j*8))&255);
+  const r=(x,n)=>(x>>>n)|(x<<(32-n)),w=[];
+  for(let o=0;o<b.length;o+=64){
+   for(let i=0;i<16;i++)w[i]=(b[o+i*4]<<24)|(b[o+i*4+1]<<16)|(b[o+i*4+2]<<8)|b[o+i*4+3];
+   for(let i=16;i<64;i++){const x=w[i-15],y=w[i-2];w[i]=(w[i-16]+(r(x,7)^r(x,18)^(x>>>3))+w[i-7]+(r(y,17)^r(y,19)^(y>>>10)))|0}
+   let [a,c,d,e,g,h,k,l]=H;
+   for(let i=0;i<64;i++){
+    const t1=(l+(r(g,6)^r(g,11)^r(g,25))+((g&h)^(~g&k))+K[i]+w[i])|0,t2=((r(a,2)^r(a,13)^r(a,22))+((a&c)^(a&d)^(c&d)))|0;
+    l=k;k=h;h=g;g=(e+t1)|0;e=d;d=c;c=a;a=(t1+t2)|0}
+   H[0]=(H[0]+a)|0;H[1]=(H[1]+c)|0;H[2]=(H[2]+d)|0;H[3]=(H[3]+e)|0;H[4]=(H[4]+g)|0;H[5]=(H[5]+h)|0;H[6]=(H[6]+k)|0;H[7]=(H[7]+l)|0}
+  return H.map(x=>(x>>>0).toString(16).padStart(8,'0')).join('')}
+const byHash = Object.fromEntries(STUDENTS.map(s=>[s[2],s]));
+const timMa = c => byHash[bam('mathland2a8|'+String(c)).slice(0,16)];
+/* số liệu trên Google Sheet ghi theo số thứ tự; dòng cũ ghi bằng mã thì vẫn nhận ra */
+const timDong = c => { c=String(c).replace(/^0+/,''); return (c.length<=3&&STUDENTS[+c-1]) || timMa(c); };
 const AVAS=['🦊','🐼','🐯','🐸','🐵','🦁','🐨','🐰','🐻','🐧','🦄','🐙','🐳','🦋'];
 const ITEMS=[
  {e:'🍎',s:'apple',p:'apples',vi:'quả táo'},{e:'⚽',s:'ball',p:'balls',vi:'quả bóng'},{e:'🐱',s:'cat',p:'cats',vi:'con mèo'},
@@ -520,9 +539,9 @@ document.addEventListener('keydown',e=>{
   if(/^[0-9]$/.test(e.key))press(e.key);else if(e.key==='Backspace')press('⌫');else if(e.key==='Enter')press('✔');
 });
 function tryLogin(){
-  const s=byCode[code];
+  const s=timMa(code);
   if(!s){$('loginMsg').textContent=code.length<6?'Con nhập đủ 6 số nhé!':'Mã chưa đúng, con thử lại nhé 🙂';sndNO();code='';drawCode();return}
-  user={stt:s[0],name:s[1],code:s[2]};store(USERKEY,user);code='';drawCode();
+  user={stt:s[0],name:s[1],code:code};store(USERKEY,user);code='';drawCode();
   sndOK();go('home');sayKeys(['hello'],'Hello! Welcome to Math Land!');
 }
 function logout(){user=null;try{localStorage.removeItem(USERKEY)}catch(e){};go('login')}
@@ -864,7 +883,7 @@ function levelUp(){setLevel(Math.min(3,cur.level+1));startRound(cur.mode)}
 function record(r){
   const log=store(LOGKEY)||[];log.push(r);store(LOGKEY,log);
   if(SHEET_URL){fetch(SHEET_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},
-    body:JSON.stringify({code:r.c,name:user.name,mode:r.m,level:r.l,score:r.s,total:r.n,point:r.p,secs:r.sec,timer:r.tl})}).catch(()=>toast('Chưa gửi được lên Google Sheet – đã lưu trên máy'))}
+    body:JSON.stringify({code:user.stt,name:user.name,mode:r.m,level:r.l,score:r.s,total:r.n,point:r.p,secs:r.sec,timer:r.tl})}).catch(()=>toast('Chưa gửi được lên Google Sheet – đã lưu trên máy'))}
 }
 
 /* ============ nói đáp án (nhận giọng) ============ */
@@ -898,8 +917,8 @@ async function openStats(){
   let log=null,src='💾 Dữ liệu trên máy này';
   if(SHEET_URL){try{const res=await fetch(SHEET_URL+'?action=stats');log=await res.json();src='☁️ Dữ liệu Google Sheet (mọi máy)'}catch(e){src='⚠️ Không tải được Google Sheet – đang xem dữ liệu trên máy này'}}
   if(!log)log=store(LOGKEY)||[];
-  const agg={};log.forEach(r=>{const c=String(r.c).padStart(6,'0');const a=agg[c]=agg[c]||{cnt:0,stars:0,secs:0,last:0,lv:0,bp:-1};a.cnt++;a.secs+=Math.min(3600,+r.sec||0);const pp=r.p!=null&&r.p!==''?+r.p:(+r.n?Math.round(r.s/r.n*20)/2:0);a.bp=Math.max(a.bp,pp);a.stars+=+r.s||0;a.last=Math.max(a.last,+r.t||0);a.lv=Math.max(a.lv,+r.l||1)});
-  statRows=STUDENTS.map(s=>({stt:s[0],name:s[1],code:s[2],...(agg[s[2]]||{cnt:0,stars:0,secs:0,last:0,lv:0,bp:-1})}));
+  const agg={};log.forEach(r=>{const hs=timDong(r.c);if(!hs)return;const c=hs[0];const a=agg[c]=agg[c]||{cnt:0,stars:0,secs:0,last:0,lv:0,bp:-1};a.cnt++;a.secs+=Math.min(3600,+r.sec||0);const pp=r.p!=null&&r.p!==''?+r.p:(+r.n?Math.round(r.s/r.n*20)/2:0);a.bp=Math.max(a.bp,pp);a.stars+=+r.s||0;a.last=Math.max(a.last,+r.t||0);a.lv=Math.max(a.lv,+r.l||1)});
+  statRows=STUDENTS.map(s=>({stt:s[0],name:s[1],...(agg[s[0]]||{cnt:0,stars:0,secs:0,last:0,lv:0,bp:-1})}));
   $('src').textContent=src;
   const joined=statRows.filter(r=>r.cnt>0).length,total=statRows.reduce((a,r)=>a+r.cnt,0),top=[...statRows].sort((a,b)=>b.cnt-a.cnt||b.stars-a.stars)[0];
   $('sum').innerHTML=`<div><b>${joined}/${STUDENTS.length}</b><span>bạn đã tham gia</span></div><div><b>${STUDENTS.length-joined}</b><span>bạn chưa tham gia</span></div><div><b>${total}</b><span>tổng lượt chơi</span></div><div><b style="font-size:1.15rem">${dur(statRows.reduce((a,r)=>a+r.secs,0))}</b><span>tổng thời gian chơi</span></div><div><b style="font-size:1.15rem">${top&&top.cnt?top.name.split(' ').slice(-2).join(' ')+' 🏅':'—'}</b><span>chăm chỉ nhất${top&&top.cnt?' ('+top.cnt+' lần)':''}</span></div>`;
@@ -915,15 +934,9 @@ function drawTable(){
   rows=srt==='cnt'?[...rows].sort((a,b)=>b.cnt-a.cnt||b.stars-a.stars||a.stt-b.stt):[...rows].sort((a,b)=>a.stt-b.stt);
   $('tbody').innerHTML=rows.map(r=>`<tr class="${r.cnt?'':'none'}"><td>${r.stt}</td><td>${r.name}</td><td class="n">${r.cnt}</td><td class="n">${r.stars}</td><td class="n">${dur(r.secs)}</td><td class="n">${r.lv?'Mức '+r.lv:'—'}</td><td class="n">${r.bp>=0?String(r.bp).replace('.',','):'—'}</td><td>${r.cnt?fmt(r.last):'Chưa chơi'}</td></tr>`).join('')||'<tr><td colspan="8" style="text-align:center;padding:20px">Không có bạn nào</td></tr>';
 }
-function exportCSV(){
-  const lines=[['STT','Họ và tên','Mã','Số lần tham gia','Tổng sao','Thời gian chơi (giây)','Mức cao nhất','Điểm cao nhất','Lần gần nhất']].concat(statRows.map(r=>[r.stt,r.name,"'"+r.code,r.cnt,r.stars,r.secs,r.lv?'Mức '+r.lv:'',r.bp>=0?r.bp:'',r.cnt?fmt(r.last):'Chưa chơi']));
-  const csv='﻿'+lines.map(l=>l.map(x=>`"${String(x).replace(/"/g,'""')}"`).join(',')).join('\n');
-  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='thong-ke-math-land-2A8.csv';a.click();
-}
-
 /* ============ khởi động ============ */
 buildKeypad();drawCode();
-const saved=store(USERKEY);if(saved&&byCode[saved.code]){user=saved;go('home')}
+const saved=store(USERKEY);if(saved&&timMa(saved.code)){user=saved;go('home')}
 </script>
 </body>
 </html>
