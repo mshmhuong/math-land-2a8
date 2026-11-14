@@ -350,7 +350,7 @@ tr.none td{color:var(--muted);opacity:.7}
       <button onclick="exportCSV()">⬇️ Tải CSV</button>
       <span class="src" id="src"></span>
     </div>
-    <div class="tablewrap"><table><thead><tr><th>STT</th><th>Họ và tên</th><th style="text-align:center">Số lần</th><th style="text-align:center">Tổng ⭐</th><th style="text-align:center">Mức cao nhất</th><th style="text-align:center">Điểm cao nhất</th><th>Lần gần nhất</th></tr></thead><tbody id="tbody"></tbody></table></div>
+    <div class="tablewrap"><table><thead><tr><th>STT</th><th>Họ và tên</th><th style="text-align:center">Số lần</th><th style="text-align:center">Tổng ⭐</th><th style="text-align:center">Thời gian chơi</th><th style="text-align:center">Mức cao nhất</th><th style="text-align:center">Điểm cao nhất</th><th>Lần gần nhất</th></tr></thead><tbody id="tbody"></tbody></table></div>
   </div>
 </div>
 <button class="fhome" id="fHome" onclick="go('home')">🏠 Trang chủ</button>
@@ -894,28 +894,29 @@ async function listenAnswer(){
 /* ============ thống kê ============ */
 let statRows=[],fil='all',srt='stt';
 async function openStats(){
-  $('stats').classList.add('on');$('tbody').innerHTML='<tr><td colspan="7" style="text-align:center;padding:24px">Đang tải… ⏳</td></tr>';
+  $('stats').classList.add('on');$('tbody').innerHTML='<tr><td colspan="8" style="text-align:center;padding:24px">Đang tải… ⏳</td></tr>';
   let log=null,src='💾 Dữ liệu trên máy này';
   if(SHEET_URL){try{const res=await fetch(SHEET_URL+'?action=stats');log=await res.json();src='☁️ Dữ liệu Google Sheet (mọi máy)'}catch(e){src='⚠️ Không tải được Google Sheet – đang xem dữ liệu trên máy này'}}
   if(!log)log=store(LOGKEY)||[];
-  const agg={};log.forEach(r=>{const c=String(r.c).padStart(6,'0');const a=agg[c]=agg[c]||{cnt:0,stars:0,last:0,lv:0,bp:-1};a.cnt++;const pp=r.p!=null&&r.p!==''?+r.p:(+r.n?Math.round(r.s/r.n*20)/2:0);a.bp=Math.max(a.bp,pp);a.stars+=+r.s||0;a.last=Math.max(a.last,+r.t||0);a.lv=Math.max(a.lv,+r.l||1)});
-  statRows=STUDENTS.map(s=>({stt:s[0],name:s[1],code:s[2],...(agg[s[2]]||{cnt:0,stars:0,last:0,lv:0,bp:-1})}));
+  const agg={};log.forEach(r=>{const c=String(r.c).padStart(6,'0');const a=agg[c]=agg[c]||{cnt:0,stars:0,secs:0,last:0,lv:0,bp:-1};a.cnt++;a.secs+=Math.min(3600,+r.sec||0);const pp=r.p!=null&&r.p!==''?+r.p:(+r.n?Math.round(r.s/r.n*20)/2:0);a.bp=Math.max(a.bp,pp);a.stars+=+r.s||0;a.last=Math.max(a.last,+r.t||0);a.lv=Math.max(a.lv,+r.l||1)});
+  statRows=STUDENTS.map(s=>({stt:s[0],name:s[1],code:s[2],...(agg[s[2]]||{cnt:0,stars:0,secs:0,last:0,lv:0,bp:-1})}));
   $('src').textContent=src;
   const joined=statRows.filter(r=>r.cnt>0).length,total=statRows.reduce((a,r)=>a+r.cnt,0),top=[...statRows].sort((a,b)=>b.cnt-a.cnt||b.stars-a.stars)[0];
-  $('sum').innerHTML=`<div><b>${joined}/${STUDENTS.length}</b><span>bạn đã tham gia</span></div><div><b>${STUDENTS.length-joined}</b><span>bạn chưa tham gia</span></div><div><b>${total}</b><span>tổng lượt chơi</span></div><div><b style="font-size:1.15rem">${top&&top.cnt?top.name.split(' ').slice(-2).join(' ')+' 🏅':'—'}</b><span>chăm chỉ nhất${top&&top.cnt?' ('+top.cnt+' lần)':''}</span></div>`;
+  $('sum').innerHTML=`<div><b>${joined}/${STUDENTS.length}</b><span>bạn đã tham gia</span></div><div><b>${STUDENTS.length-joined}</b><span>bạn chưa tham gia</span></div><div><b>${total}</b><span>tổng lượt chơi</span></div><div><b style="font-size:1.15rem">${dur(statRows.reduce((a,r)=>a+r.secs,0))}</b><span>tổng thời gian chơi</span></div><div><b style="font-size:1.15rem">${top&&top.cnt?top.name.split(' ').slice(-2).join(' ')+' 🏅':'—'}</b><span>chăm chỉ nhất${top&&top.cnt?' ('+top.cnt+' lần)':''}</span></div>`;
   drawTable();
 }
 function closeStats(){$('stats').classList.remove('on')}
 function setFilter(b){fil=b.dataset.f;document.querySelectorAll('[data-f]').forEach(x=>x.classList.toggle('on',x===b));drawTable()}
 function setSort(b){srt=b.dataset.s;document.querySelectorAll('[data-s]').forEach(x=>x.classList.toggle('on',x===b));drawTable()}
+function dur(s){s=Math.round(+s||0);return !s?'—':s<60?s+' giây':s<3600?Math.round(s/60)+' phút':Math.floor(s/3600)+' giờ '+Math.round(s%3600/60)+' phút'}
 function fmt(t){if(!t)return '—';const d=new Date(t);return d.toLocaleDateString('vi-VN')+' '+d.toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'})}
 function drawTable(){
   let rows=statRows.filter(r=>fil==='all'||(fil==='yes'?r.cnt>0:r.cnt===0));
   rows=srt==='cnt'?[...rows].sort((a,b)=>b.cnt-a.cnt||b.stars-a.stars||a.stt-b.stt):[...rows].sort((a,b)=>a.stt-b.stt);
-  $('tbody').innerHTML=rows.map(r=>`<tr class="${r.cnt?'':'none'}"><td>${r.stt}</td><td>${r.name}</td><td class="n">${r.cnt}</td><td class="n">${r.stars}</td><td class="n">${r.lv?'Mức '+r.lv:'—'}</td><td class="n">${r.bp>=0?String(r.bp).replace('.',','):'—'}</td><td>${r.cnt?fmt(r.last):'Chưa chơi'}</td></tr>`).join('')||'<tr><td colspan="7" style="text-align:center;padding:20px">Không có bạn nào</td></tr>';
+  $('tbody').innerHTML=rows.map(r=>`<tr class="${r.cnt?'':'none'}"><td>${r.stt}</td><td>${r.name}</td><td class="n">${r.cnt}</td><td class="n">${r.stars}</td><td class="n">${dur(r.secs)}</td><td class="n">${r.lv?'Mức '+r.lv:'—'}</td><td class="n">${r.bp>=0?String(r.bp).replace('.',','):'—'}</td><td>${r.cnt?fmt(r.last):'Chưa chơi'}</td></tr>`).join('')||'<tr><td colspan="8" style="text-align:center;padding:20px">Không có bạn nào</td></tr>';
 }
 function exportCSV(){
-  const lines=[['STT','Họ và tên','Mã','Số lần tham gia','Tổng sao','Mức cao nhất','Điểm cao nhất','Lần gần nhất']].concat(statRows.map(r=>[r.stt,r.name,"'"+r.code,r.cnt,r.stars,r.lv?'Mức '+r.lv:'',r.bp>=0?r.bp:'',r.cnt?fmt(r.last):'Chưa chơi']));
+  const lines=[['STT','Họ và tên','Mã','Số lần tham gia','Tổng sao','Thời gian chơi (giây)','Mức cao nhất','Điểm cao nhất','Lần gần nhất']].concat(statRows.map(r=>[r.stt,r.name,"'"+r.code,r.cnt,r.stars,r.secs,r.lv?'Mức '+r.lv:'',r.bp>=0?r.bp:'',r.cnt?fmt(r.last):'Chưa chơi']));
   const csv='﻿'+lines.map(l=>l.map(x=>`"${String(x).replace(/"/g,'""')}"`).join(',')).join('\n');
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='thong-ke-math-land-2A8.csv';a.click();
 }
