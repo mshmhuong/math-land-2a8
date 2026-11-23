@@ -529,9 +529,15 @@ async function sayKeys(keys,text,slow,gapSec){
     const bufs=await Promise.all(keys.map(k=>k==='_'?null:decode(k)));
     if(id!==sayId)return;
     const sr=bufs.find(b=>b).sampleRate,gap=Math.round(sr*(gapSec!=null?gapSec:PACES[pace].gap)),pause=Math.round(sr*.8);
-    let len=0;bufs.forEach(b=>len+=(b?b.length+gap:pause));
+    /* đoạn giữa câu (The cat is | 4 | kilograms) đọc liền một mạch; chỉ nghỉ ở cuối câu (dấu chấm, dấu hỏi) */
+    const MID=/^(the_.+_(is|has|holds)|num\d+|ihave)$/,TH=Math.pow(10,-42/20);
+    const parts=bufs.map((b,i)=>{if(!b)return null;const d=b.getChannelData(0);let a=0,e=d.length;
+      const mid=MID.test(keys[i])&&i<keys.length-1&&keys[i+1]!=='_';
+      if(mid){while(a<e&&Math.abs(d[a])<TH)a++;while(e>a&&Math.abs(d[e-1])<TH)e--;a=Math.max(0,a-Math.round(sr*.015));e=Math.min(d.length,e+Math.round(sr*.02))}
+      return {d:d.subarray(a,e),g:mid?0:gap}});
+    let len=0;parts.forEach(b=>len+=(b?b.d.length+b.g:pause));
     const out=new Float32Array(len);let o=0;
-    bufs.forEach(b=>{if(b){out.set(b.getChannelData(0),o);o+=b.length+gap}else o+=pause});
+    parts.forEach(b=>{if(b){out.set(b.d,o);o+=b.d.length+b.g}else o+=pause});
     if(curURL)URL.revokeObjectURL(curURL);curURL=URL.createObjectURL(wav(out,sr));
     await playSrc(curURL,slow);
   }catch(e){
