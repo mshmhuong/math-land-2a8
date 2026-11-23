@@ -676,17 +676,23 @@ function playMine(){if(myRec){sayId++;playSrc(myRec,false)}}
 
 /* ===== con đọc – cô chấm điểm, rồi phát lại đúng từ/câu mẫu ===== */
 let sayRecog=null;
-const SAYFIX={know:'now',no:'now',equal:'equals',ad:'add',odd:'add',hev:'have',half:'have',minis:'minus',lest:'left',liter:'litre',liters:'litres',kilo:'kilogram',kilos:'kilograms',heavy:'heavy',total:'total'};
+const SAYFIX={know:'now',no:'now',equal:'equals',ad:'add',odd:'add',hev:'have',half:'have',minis:'minus',lest:'left',liter:'litre',liters:'litres',leader:'litre',leaders:'litres',litter:'litre',litters:'litres',later:'litre',lita:'litre',leeter:'litre',liters:'litres',litre:'litre',litres:'litres',letter:'litre',letters:'litres',lead:'litre',kg:'kilogram',kgs:'kilograms',kilo:'kilogram',kilos:'kilograms',heavy:'heavy',total:'total'};
 function sayTokens(t){
   return String(t).toLowerCase().replace(/…/g,' ').replace(/[^a-z0-9' ]/g,' ').split(/\s+/).filter(Boolean)
     .map(w=>/^\d+$/.test(w)&&+w<=30?EN(+w):w).join(' ').replace(/-/g,' ').split(/\s+/).filter(Boolean)
-    .map(w=>SAYFIX[w]||w);
+    .map(w=>SAYFIX[w]||w).join(' ').replace(/kilo gram(s?)/g,'kilogram$1').replace(/kilo grams/g,'kilograms').replace(/lee ter(s?)/g,'litre$1').split(/\s+/).filter(Boolean);
 }
+/* so gần đúng: khác 1 chữ cái (từ dài >=5) hoặc số ít/số nhiều thì vẫn tính đúng */
+function nearWord(a,b){if(a===b)return true;if((a==='two'&&(b==='to'||b==='too'))||(b==='two'&&(a==='to'||a==='too'))||(a==='four'&&b==='for')||(b==='four'&&a==='for'))return true;const A=a.replace(/s$/,''),B=b.replace(/s$/,'');if(A===B)return true;
+  if(Math.min(A.length,B.length)<5||Math.abs(A.length-B.length)>1)return false;
+  let i=0,j=0,d=0;while(i<A.length&&j<B.length){if(A[i]===B[j]){i++;j++;continue}if(++d>1)return false;
+    if(A.length>B.length)i++;else if(A.length<B.length)j++;else{i++;j++}}
+  return d+(A.length-i)+(B.length-j)<=1}
 function sayTarget(){const v=curVocab()[ci],bk=$('flip').classList.contains('back');
   return{text:bk?v.ex:(v.say||v.en.replace(/\s*…\s*/g,' ')),key:(bk?'ex_':'w_')+v.k,show:bk?v.ex:v.en};}
 function sayMatch(target,heard){ /* đánh dấu từng từ mẫu: con đọc đúng chưa */
-  const pool={};heard.forEach(w=>pool[w]=(pool[w]||0)+1);
-  return target.map(w=>{const ok=pool[w]>0;if(ok)pool[w]--;return ok});
+  const pool=heard.slice();
+  return target.map(w=>{let k=pool.indexOf(w);if(k<0)k=pool.findIndex(h=>nearWord(h,w));if(k>=0)pool.splice(k,1);return k>=0});
 }
 function stopSayCheck(){try{if(sayRecog)sayRecog.abort()}catch(e){}sayRecog=null;resetSayBtn()}
 function resetSayBtn(){const b=$('sayBtn');if(!b)return;b.classList.remove('live');b.innerHTML='🎯 Con đọc to – cô chấm điểm'}
